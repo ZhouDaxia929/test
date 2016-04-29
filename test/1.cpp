@@ -1,135 +1,58 @@
 #include <iostream>
 #include <cstdio>
-#include <cstdlib>
 using namespace std;
-int N;
-int Flag1 = 0, Flag2 = 0, Count1 = 0, Count2 = 0,F=0;
-int arr4[50][101];
-void insert_sort(int*array,int *array2, unsigned int n)
+
+//最长上升子序列(n^2)模板
+//入口参数：1.数组名称 2.数组长度（注意从1号位置开始）
+//状态转移方程：dp(i)=max{1,dp[j]+1}  (j=1,2,3,...,i-1 且 A[j]<A[i])
+template<class T>
+int LIS(T a[], int n)
 {
 	int i, j;
-	int temp;
-	for (i = 1;i<n;i++)
+	int ans = 0;
+	int m = 0;
+	int *dp = new int[n + 1];
+	
+	/*
+	//这个方法似乎比较麻烦，且不太符合状态转换方程
+	dp[1] = 1;
+	for (i = 2;i <= n;i++)  //确定当前起点
 	{
-		if (Flag1 == 1) {
-			temp = *(array + i);
-			for (j = i;j>0 && *(array + j - 1)>temp;j--)
-			{
-				*(array + j) = *(array + j - 1);
-			}
-			*(array + j) = temp;
-			for (int c = 0;c < N;c++) {
-				if (c == (N - 1))
-					cout << array[c];
-				else
-					cout << array[c] << " ";
-			}
-			break;
-		}
-		else{
-			temp = *(array + i);
-			for (j = i;j>0 && *(array + j - 1)>temp;j--)
-			{
-				*(array + j) = *(array + j - 1);
-			}
-			*(array + j) = temp;
-			for (int a = 0;a < N;a++) {
-					if (array[a] == array2[a]) {
-						Count1 = 1;
-					}
-					else {
-						Count1 = 0;
-						break;
-					}
-			}
-			if (Count1 == 1) {
-				cout << "Insertion Sort" << endl;
-				Flag1 = 1;
-			}
-		}
-	}
-}
-
-void Merge(int* data, int a, int b, int length, int n) {
-	int right;
-	if (b + length - 1 >= n - 1) right = n - b;
-	else right = length;
-	int* temp = new int[length + right];
-	int i = 0, j = 0;
-	while (i <= length - 1 && j <= right - 1) {
-		if (data[a + i] <= data[b + j]) {
-			temp[i + j] = data[a + i];i++;
-		}
-		else {
-			temp[i + j] = data[b + j];
-			j++;
-		}
-	}
-	if (j == right) {//a中还有元素，且全都比b中的大,a[i]还未使用
-		memcpy(temp + i + j, data + a + i, (length - i) * sizeof(int));
-	}
-	else if (i == length) {
-		memcpy(temp + i + j, data + b + j, (right - j) * sizeof(int));
-	}
-	memcpy(data + a, temp, (right + length) * sizeof(int));
-	delete[] temp;
-}
-void  MergeSort(int* data, int n,int *arr2) {
-	int step = 1;
-	while (step < n) {
-		for (int i = 0; i <= n - step - 1; i += 2 * step)
+		m = 0;   //以dp[i]为根的正确序列长度
+		for (j = 1;j<i;j++)
 		{
-			if (Flag2 == 1&&F==0) {
-				Merge(data, i, i + step, step, n);
-				F++;
-			}
-
-			else if (Flag2 == 1 && F == 1) {
-				Merge(data, i, i + step, step, n);
-				for (int c = 0;c < N;c++) {
-					if (c == (N - 1))
-						cout << data[c];
-					else
-						cout << data[c] << " ";
-				}
-				exit(1);
-			}
-
-			else {
-				Merge(data, i, i + step, step, n);
-
-				for (int a = 0;a < N;a++) {
-					if (data[a] == arr2[a]) {
-						Count2 = 1;
-					}
-					else {
-						Count2 = 0;
-						break;
-					}
-				}
-				if (Count2 == 1) {
-					cout << "Merge Sort" << endl;
-					Flag2 = 1;
-				}
+			if (dp[j]>m&&a[j]<a[i])
+				m = dp[j];   //满足条件，更新结果
+		}
+		dp[i] = m + 1;
+		if (dp[i]>ans)
+			ans = dp[i];
+	}
+	*/
+	//标准程序
+	for (i = 1; i <= n; i++){
+		dp[i] = 1;
+		for (j = 1; j <= i - 1; j++){
+			if (a[j] < a[i] && dp[i] < dp[j] + 1) {   //这里应用状态转移方程
+				dp[i] = dp[j] + 1;
 			}
 		}
-		step *= 2;
+		/* 记录最长子序列 */
+		if (dp[i] > ans) ans = dp[i];
 	}
+	return ans;
 }
-int main()
-{
-	cin >> N;
-	int arr[101];
-	for (int i = 0;i < N;i++)
-		cin >> arr[i];
-	int arr3[101];
-	for (int i = 0;i < N;i++)
-		arr3[i] = arr[i];
-	int arr2[101];
-	for (int i = 0;i < N;i++)
-		cin >> arr2[i];
-	insert_sort(arr,arr2, N);
-	int temp[101] = {0};
-	MergeSort(arr3 ,N-1 ,arr2);
+
+
+int main() {
+	int n;
+	while (scanf("%d", &n) == 1 & n > 0) {
+		int *arr = new int[n + 1];
+		int i = 1;
+		while (i<n+1) {
+			cin >> arr[i++];
+		}
+		cout << LIS(arr, n) << endl;
+	}
 	return 0;
 }
